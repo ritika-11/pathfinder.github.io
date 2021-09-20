@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>PathFinding.js</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./lib/themes/jquery.ui.all.css" />
+
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript" src="./lib/raphael-min.js"></script>
+    <script type="text/javascript" src="./lib/es5-shim.min.js"></script>
+    <script type="text/javascript" src="./lib/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="./lib/state-machine.min.js"></script>
+    <script type="text/javascript" src="./lib/async.min.js"></script>
+
+    <script type="text/javascript" src="./lib/ui/jquery.ui.core.min.js"></script>
+    <script type="text/javascript" src="./lib/ui/jquery.ui.widget.min.js"></script>
+    <script type="text/javascript" src="./lib/ui/jquery.ui.mouse.min.js"></script>
+    <script type="text/javascript" src="./lib/ui/jquery.ui.draggable.min.js"></script>
+    <script type="text/javascript" src="./lib/ui/jquery.ui.accordion.min.js"></script>
+    <script type="text/javascript" src="./lib/ui/jquery.ui.slider.min.js"></script>
+
+    <script type="text/javascript" src="./lib/pathfinder.js"></script>
+
+    <script type="text/javascript" src="./js/view.js"></script>
+    <script type="text/javascript" src="./js/controller.js"></script>
+    <script type="text/javascript" src="./js/panel.js"></script>
+    <script type="text/javascript" src="./js/main.js"></script>
+  </head>
+  <body>
+    <div class=bg id="draw_area" ></div>
+
+    <div id="graph" class="w3-modal">
+      <div id='left' style="width: 720px; height:500px; padding-left: 20px;padding-right:20px"class="w3-modal-content">
+          <button onclick="document.getElementById('graph').style.display='none'"style="height:50px;width:50px">X</button>
+        <div id="chartContainer1" ></div>
+      </div>
+       <div id='right' style="width: 720px; height:500px; padding-left: 20px;padding-right:20px;"class="w3-modal-content">
+          <button onclick="document.getElementById('graph').style.display='none'"style="height:50px;width:50px">X</button>
+        <div id="chartContainer2" ></div>
+      </div>
+    </div>
+
+
+    <div id="instructions_panel" class="panel" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: medium;">
+      <header>
+        <h2 class="header_title">Instructions</h2>
+        <span id="hide_instructions">hide</span>
+      </header>
+      Click within the <span class="white">white</span> grid and drag your mouse to draw obstacles. <br>
+      Drag the <span class="green">green</span> node to set the start position. <br>
+      Choose the option <span class="blue">Add Destination</span> to set the end positions. <br>
+      Choose an algorithm from the right-hand panel. <br>
+      Click Start Search in the lower-right corner to start the animation.<br>
+      Give a set of obstacles and press compare button to compare algorithms.<br>
+    </div>
+
+    <div id="algorithm_panel" class="panel right_panel">
+      <header><h2 class="header_title">Select an Algorithm</h2></header>
+
+      <div class="accordion">
+        <h3 id="astar_header"><a href="#">A*</a></h3>
+        <div id="astar_section" class="finder_section">
+          <header class="option_header">
+            <h6>Heuristic</h6>
+          </header>
+          <div id="astar_heuristic" class="sub_options">
+            <input type="radio" name="astar_heuristic" value="manhattan" checked />
+            <label class="option_label">Manhattan</label> <br>
+            <input type="radio" name="astar_heuristic" value="euclidean"/>
+            <label class="option_label">Euclidean</label> <br> 
+          </div>
+
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+            <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label> <br> <br> <br> <br>
+          </div>
+        </div>
+
+        <h3 id="ida_header"><a href="#">IDA*</a></h3>
+        <div id="ida_section" class="finder_section">
+          <header class="option_header">
+            <h6>Heuristic</h6>
+          </header>
+          <div id="ida_heuristic" class="sub_options">
+            <input type="radio" name="ida_heuristic" value="manhattan" checked/>
+            <label class="option_label">Manhattan</label> <br>
+            <input type="radio" name="ida_heuristic" value="euclidean" />
+            <label class="option_label">Euclidean</label> <br>
+           
+            
+          </div>
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+            <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label> <br>
+            <input type="checkbox" class="visualize_recursion" checked>
+            <label class="option_label">Visualize Recursion</label> <br> <br>
+            <input class="spinner" name="time_limit" value="15">
+            <label class="option_label">Seconds limit</label> <br>
+          </div>
+        </div>
+
+        <h3 id="breadthfirst_header"><a href="#">Breadth-First-Search</a></h3>
+        <div id="breadthfirst_section" class="finder_section">
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+            <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label>
+          </div>
+          <div>
+          <p style="text-align:center;">Try adding multiple end points.</p>
+          </div>
+        </div>
+
+        <h3 id="bestfirst_header"><a href="#">Best-First-Search</a></h3>
+        <div id="bestfirst_section" class="finder_section">
+          <header class="option_header">
+            <h6>Heuristic</h6>
+          </header>
+          <div id="bestfirst_heuristic" class="sub_options">
+            <input type="radio" name="bestfirst_heuristic" value="manhattan" checked />
+            <label class="option_label">Manhattan</label> <br>
+            <input type="radio" name="bestfirst_heuristic" value="euclidean"/>
+            <label class="option_label">Euclidean</label> <br>
+            <input type="radio" name="bestfirst_heuristic" value="octile"/>
+            <label class="option_label">Octile</label> <br>
+            <input type="radio" name="bestfirst_heuristic" value="chebyshev"/>
+            <label class="option_label">Chebyshev</label> <br>
+          </div>
+
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+            <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label> <br> <br>
+          </div>
+          <div style="text-align:center;">
+            Try adding multiple end points.
+          </div>
+        </div>
+
+        <h3 id="dijkstra_header"><a href="#">Dijkstra</a></h3>
+        <div id="dijkstra_section" class="finder_section">
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+            <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label>
+          </div>
+          <div>
+            <p style="text-align:center;">Try adding multiple end points.</p>
+            </div>
+        </div>
+
+        <h3 id="thetastar_header"><a href="#">Theta*</a></h3>
+        <div id="thetastar_section" class="finder_section">
+          <header class="option_header">
+            <h6>Heuristic</h6>
+          </header>
+          <div id="thetastar_heuristic" class="sub_options">
+            <input type="radio" name="thetastar_heuristic" value="manhattan" checked />
+            <label class="option_label">Manhattan</label> <br>
+            <input type="radio" name="thetastar_heuristic" value="euclidean"/>
+            <label class="option_label">Euclidean</label> <br>
+          </div>
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+            <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label> <br> <br> <br>
+          </div>
+        </div>
+
+        <h3 id="k_paths_header"><a href="#">KShortestPaths</a></h3>
+        <div id="k_paths_section" class="finder_section">
+          <header class="option_header">
+            <h6>Number of Paths</h6>
+          </header>
+          <div id="KShortestPaths" class="sub_options">
+            <input type="radio" name="NumberOfPaths" value="1"/>
+            <label class="option_label">1</label> <br>
+            <input type="radio" name="NumberOfPaths" value="2"/>
+            <label class="option_label">2</label> <br>
+            <input type="radio" name="NumberOfPaths" value="3" checked/>
+            <label class="option_label">3</label> <br> 
+          </div>
+          <header class="option_header">
+            <h6>Options</h6>
+          </header>
+          <div class="optional sub_options">
+             <input type="checkbox" class="allow_diagonal" checked>
+            <label class="option_label">Allow Diagonal</label> <br>
+            <input type="checkbox" class="visualize_recursion" checked>
+            <label class="option_label">Visualize Recursion</label> <br>
+          </div>
+        </div>
+
+      </div><!-- .accordion -->
+    </div><!-- #algorithm_panel -->
+
+    <div id="play_panel" class="panel right_panel">
+      <button id="button1" class="control_button">Start Search</button>
+      <button id="button2" class="control_button">Pause Search</button>
+      <button id="button3" class="control_button">Clear Walls</button> <br> <br>
+      <div id="wall_destination" class="sub_options">
+        <input type="radio" name="wall_destination" value="wall" checked />
+        <label class="option_label">Add Wall</label> <br>
+        <input type="radio" name="wall_destination" value="destination"/>
+        <label class="option_label">Add Destination</label> <br> <br>
+      </div>
+      <button id="button4" class="control_button"style="width:98.5px;">Compare Algorithms</button>
+      <button id="button5" onclick="displayInstructions()"style="width:98.5px;"class="control_button">Show Instructions</button>
+
+    </div>
+
+    <div id="stats"></div>
+
+    <footer>
+      Project Hosted on <a href="https://github.com/ritika-11/PathFinder">Github</a>
+    </footer>
+    <script>
+      
+      function displayInstructions() {
+        document.getElementById('instructions_panel').style.display='block';
+      }
+    </script> 
+  </body>
+</html>
